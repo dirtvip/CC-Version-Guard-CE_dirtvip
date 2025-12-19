@@ -33,7 +33,8 @@ Automatic updates frequently:
 |---------|-------------|
 | **Version Detection** | Automatically scans your system for all installed CapCut versions |
 | **Version Selection** | Choose exactly which version to keep — the rest are safely removed |
-| **Download Manager** | Curated links to legacy versions from [ProjectBukkit](https://github.com/ProjectBukkit/CapcutVersions) |
+| **Download Manager** | Direct downloads from official ByteDance CDN with 6 curated legacy versions |
+| **Cache Cleaner** | Clean up CapCut cache to free disk space and ensure fresh installation |
 | **Update Blocking** | Locks configuration files and creates blocker files to prevent auto-updates |
 | **Guided Wizard** | Step-by-step flow — no technical knowledge required |
 
@@ -43,7 +44,10 @@ Automatic updates frequently:
 |---------|---------|----------|
 | 🖥️ **Offline Purist** | 1.5.0 | Clean UI, unrestricted 4K export, zero cloud dependency |
 | 🔊 **Audio Engineer** | 2.5.4 | Multi-track audio editing, stable mixer, keyframe support |
-| ✨ **Creator** | 3.9.0 | Last version with free Auto-Captions (API-dependent) |
+| 🎬 **Classic Pro** | 2.9.0 | Maximum free features, legacy UI, stable performance |
+| ⚖️ **Modern Stable** | 3.2.0 | Good balance of modern features vs paywalls |
+| ✨ **Creator** | 3.9.0 | Last version with free Auto-Captions (High Risk) |
+| ⚡ **Power User** | 4.0.0 | Track height adjustment, markers (Stricter Paywall) |
 
 ---
 
@@ -82,28 +86,31 @@ flowchart LR
     subgraph Main Flow
         A[Welcome] --> B{PreCheck}
         B -->|CapCut Found| C[Version Select]
-        C --> D[Running]
-        D --> E[Complete]
+        C --> D[Cache Clean]
+        D --> E[Running]
+        E --> F[Complete]
     end
 
     subgraph Alternative
-        A -->|Download Legacy| F[Download Manager]
-        F -->|Opens Browser| G[ProjectBukkit]
+        A -->|Download Legacy| G[Download Manager]
+        G -->|Direct CDN Link| H[ByteDance CDN]
     end
 
     subgraph Protection Steps
-        D -->|Step 1| H[Delete Other Versions]
-        D -->|Step 2| I[Lock Config Files]
-        D -->|Step 3| J[Create Blockers]
+        E -->|Step 1| I[Delete Other Versions]
+        E -->|Step 2| J[Clean Cache]
+        E -->|Step 3| K[Lock Config Files]
+        E -->|Step 4| L[Create Blockers]
     end
 ```
 
 ### Protection Mechanisms
 
 1. **Version Cleanup** — Removes all versions except your selected one from `%LOCALAPPDATA%\CapCut\Apps\`
-2. **Config Locking** — Sets critical configuration files to read-only
-3. **Blocker Files** — Creates backup files (`updater.exe.bak`) that prevent the updater from running
-4. **Directory Blockers** — Creates blocking folders (`CapCutUpdater.bak/`) that occupy updater paths
+2. **Cache Cleaning** — Optionally clears CapCut cache to free disk space
+3. **Config Locking** — Sets critical configuration files to read-only
+4. **Blocker Files** — Creates backup files (`updater.exe.bak`) that prevent the updater from running
+5. **Directory Blockers** — Creates blocking folders (`CapCutUpdater.bak/`) that occupy updater paths
 
 ---
 
@@ -118,13 +125,15 @@ flowchart LR
 | **egui-phosphor** | Professional icon set |
 | **walkdir** | Directory traversal |
 | **sysinfo** | Process detection |
+| **reqwest** | HTTP client for downloads |
+| **serde** | JSON serialization |
 
 ### Project Structure
 
 ```
 capcut_guard_rust/
 ├── src/
-│   └── main.rs           # Single-file application (~1100 lines)
+│   └── main.rs           # Single-file application (~1350 lines)
 ├── docs/
 │   ├── Features/         # Feature specifications
 │   ├── ADR/              # Architecture Decision Records
