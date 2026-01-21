@@ -1,0 +1,49 @@
+name: Build Portable Windows EXE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Build Tauri (no installer)
+        run: npm run tauri build -- --no-bundle
+
+      - name: Prepare portable folder
+        shell: pwsh
+        run: |
+          mkdir portable
+          copy src-tauri\target\release\*.exe portable\
+          copy src-tauri\target\release\*.dll portable\ -ErrorAction SilentlyContinue
+          copy src-tauri\target\release\resources portable\ -Recurse -ErrorAction SilentlyContinue
+
+      - name: Zip portable app
+        shell: pwsh
+        run: |
+          Compress-Archive portable CC-Version-Guard-Portable.zip
+
+      - name: Upload portable exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: CC-Version-Guard-Portable
+          path: CC-Version-Guard-Portable.zip
